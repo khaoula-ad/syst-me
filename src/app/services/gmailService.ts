@@ -1,3 +1,5 @@
+const SERVER_URL = 'https://budget-server-84qj.onrender.com';
+
 export interface RawEmail {
   budgetName: string;
   userName: string;
@@ -5,7 +7,7 @@ export interface RawEmail {
 }
 
 export async function sendRawEmail(email: RawEmail): Promise<void> {
-  const res = await fetch('http://localhost:3001/send-email', {
+  const res = await fetch(`${SERVER_URL}/send-email`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(email),

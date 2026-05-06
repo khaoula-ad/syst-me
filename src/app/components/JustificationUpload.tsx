@@ -27,7 +27,7 @@ export default function JustificationUpload() {
     formData.append('prenom', prenom);
 
     try {
-      const res = await fetch('http://localhost:3001/upload-justification', {
+      const res = await fetch('https://budget-server-84qj.onrender.com/upload-justification', {
         method: 'POST',
         body: formData,
       });

@@ -48,7 +48,7 @@ app.post('/send-email', async (req, res) => {
   const timestamp = new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Casablanca' });
   const [prenom, ...nomParts] = userName.split(' ');
   const nom = nomParts.join(' ');
-  const justifLink = `http://localhost:5173/justification?id=${encodeURIComponent(budgetName)}&nom=${encodeURIComponent(nom)}&prenom=${encodeURIComponent(prenom)}`;
+  const justifLink = `https://syst-me.vercel.app/justification?id=${encodeURIComponent(budgetName)}&nom=${encodeURIComponent(nom)}&prenom=${encodeURIComponent(prenom)}`;
 
   const body = [
     'Bonjour,',

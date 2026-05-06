@@ -21,6 +21,8 @@ interface Justification {
   uploadedAt: string;
 }
 
+const SERVER_URL = 'https://budget-server-84qj.onrender.com';
+
 export default function Dashboard() {
   const [globalBudget, setGlobalBudget] = useState(10000);
   const [budgetInput, setBudgetInput] = useState('10000');
@@ -37,7 +39,7 @@ export default function Dashboard() {
 
   const fetchJustifications = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:3001/justifications');
+      const res = await fetch(`${SERVER_URL}/justifications`);
       const data = await res.json();
       setJustifications(data);
     } catch { /* server not running */ }
@@ -45,7 +47,7 @@ export default function Dashboard() {
 
   const checkExpiredEntries = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:3001/expired-entries');
+      const res = await fetch(`${SERVER_URL}/expired-entries`);
       const expired: { entryId: string }[] = await res.json();
       if (expired.length === 0) return;
       setEntries(prev =>
@@ -55,7 +57,7 @@ export default function Dashboard() {
         })
       );
       await Promise.all(
-        expired.map(ex => fetch(`http://localhost:3001/pending-entries/${encodeURIComponent(ex.entryId)}`, { method: 'DELETE' }))
+        expired.map(ex => fetch(`${SERVER_URL}/pending-entries/${encodeURIComponent(ex.entryId)}`, { method: 'DELETE' }))
       );
     } catch { /* server not running */ }
   }, []);
@@ -107,12 +109,12 @@ export default function Dashboard() {
 
   const handleDecision = async (justif: Justification, decision: 'validé' | 'non-validé') => {
     try {
-      await fetch(`http://localhost:3001/entries/${encodeURIComponent(justif.entryId)}/decision`, {
+      await fetch(`${SERVER_URL}/entries/${encodeURIComponent(justif.entryId)}/decision`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ decision }),
       });
-      await fetch(`http://localhost:3001/justifications/${encodeURIComponent(justif.entryId)}`, { method: 'DELETE' });
+      await fetch(`${SERVER_URL}/justifications/${encodeURIComponent(justif.entryId)}`, { method: 'DELETE' });
       setEntries(prev =>
         prev.map(e =>
           e.id === justif.entryId && e.nom === justif.nom && e.prenom === justif.prenom
@@ -201,7 +203,7 @@ export default function Dashboard() {
                     <p className="text-sm text-slate-500">Dossier : <span className="font-medium text-slate-700">{justif.entryId}</span></p>
                     <p className="text-sm text-slate-500">Reçu le : {new Date(justif.uploadedAt).toLocaleString('fr-FR')}</p>
                     <a
-                      href={`http://localhost:3001/uploads/${justif.filename}`}
+                      href={`${SERVER_URL}/uploads/${justif.filename}`}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline mt-1"
