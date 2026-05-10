@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -30,13 +30,7 @@ const pendingEntries = {};
 // In-memory store for all entries and their statuses
 const entriesStore = {};
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Send alert email with justification link
 app.post('/send-email', async (req, res) => {
@@ -73,8 +67,8 @@ app.post('/send-email', async (req, res) => {
   ].join('\n');
 
   try {
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
+    await resend.emails.send({
+      from: 'Budget App <onboarding@resend.dev>',
       to: 'safaasalmi2003@gmail.com',
       subject: 'Alerte – Dépassement de budget',
       text: body,
