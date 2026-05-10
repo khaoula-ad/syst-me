@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -30,7 +30,15 @@ const pendingEntries = {};
 // In-memory store for all entries and their statuses
 const entriesStore = {};
 
-const resend = new Resend(process.env.RESEND_API_KEY ?? '');
+const transporter = nodemailer.createTransport({
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'aad484001@smtp-brevo.com',
+    pass: 'd63xW4qKBYsVZJDL',
+  },
+});
 
 // Send alert email with justification link
 app.post('/send-email', async (req, res) => {
@@ -67,8 +75,8 @@ app.post('/send-email', async (req, res) => {
   ].join('\n');
 
   try {
-    await resend.emails.send({
-      from: 'Budget App <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: '"Budget App" <aad484001@smtp-brevo.com>',
       to: 'safaasalmi2003@gmail.com',
       subject: 'Alerte – Dépassement de budget',
       text: body,
