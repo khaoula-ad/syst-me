@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import nodemailer from 'nodemailer';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -30,15 +29,27 @@ const pendingEntries = {};
 // In-memory store for all entries and their statuses
 const entriesStore = {};
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp-relay.brevo.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: 'aad484001@smtp-brevo.com',
-    pass: 'd63xW4qKBYsVZJDL',
-  },
-});
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+
+async function sendEmail(to, subject, text) {
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': BREVO_API_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: { name: 'Budget App', email: 'adadd.khaoula@gmail.com' },
+      to: [{ email: to }],
+      subject,
+      textContent: text,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Brevo error: ${err}`);
+  }
+}
 
 // Send alert email with justification link
 app.post('/send-email', async (req, res) => {
@@ -75,12 +86,7 @@ app.post('/send-email', async (req, res) => {
   ].join('\n');
 
   try {
-    await transporter.sendMail({
-      from: '"Budget App" <aad484001@smtp-brevo.com>',
-      to: 'safaasalmi2003@gmail.com',
-      subject: 'Alerte – Dépassement de budget',
-      text: body,
-    });
+    await sendEmail('safaasalmi2003@gmail.com', 'Alerte – Dépassement de budget', body);
 
     // Store entry as pending with timestamp
     pendingEntries[budgetName] = {
