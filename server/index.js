@@ -30,7 +30,7 @@ const pendingEntries = {};
 // In-memory store for all entries and their statuses
 const entriesStore = {};
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY ?? '');
 
 // Send alert email with justification link
 app.post('/send-email', async (req, res) => {
@@ -170,4 +170,5 @@ app.delete('/justifications/:entryId', (req, res) => {
   res.json({ success: true });
 });
 
-app.listen(3001, () => console.log('Email server running on http://localhost:3001'));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Email server running on port ${PORT}`));
